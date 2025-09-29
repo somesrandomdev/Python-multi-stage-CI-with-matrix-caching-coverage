@@ -47,3 +47,23 @@ jobs:
         with:
           name: build-${{ matrix.os }}-py${{ matrix.python }}
           path: dist/
+# ~~~~~~~~~~~~  existing content above stays ~~~~~~~~~~~~
+
+  deploy:                                   # <-- ADD THIS BLOCK
+    name: Deploy to Railway
+    needs: lint-test-build                  # only run after green CI
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Railway CLI
+        run: npm i -g @railway/cli
+
+      - name: Deploy
+        env:
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+          RAILWAY_PROJECT_ID: ${{ secrets.RAILWAY_PROJECT_ID }}
+        run: |
+          railway login --token "$RAILWAY_TOKEN"
+          railway use "$RAILWAY_PROJECT_ID"
+          railway up --detach

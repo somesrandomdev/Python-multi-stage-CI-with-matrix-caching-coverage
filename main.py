@@ -1,6 +1,13 @@
-def hello(name="world"):
-    return f"Hello, {name}!"
+from flask import Flask, jsonify
+import os
 
+app = Flask(__name__)
+
+@app.route("/")
+def alive():
+    return jsonify(message="🚀 Hello, I’m alive and 100 % deployed by Railway!")
 
 if __name__ == "__main__":
-    print(hello())
+    # Railway injects PORT env-var; fallback for local test
+    port = int(os.getenv("PORT", 5000))
+    app.run(host="0.0.0.0", port=port)
