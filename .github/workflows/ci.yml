@@ -75,4 +75,7 @@ jobs:
       - name: Deploy
         env:
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
-        run: railway up --detach
+          RAILWAY_PROJECT_ID: ${{ secrets.RAILWAY_PROJECT_ID }}
+        run: |
+          railway use ${{ secrets.RAILWAY_PROJECT_ID }}
+          railway up --detach
