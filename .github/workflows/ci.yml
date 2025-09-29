@@ -23,7 +23,7 @@ jobs:
 
       - name: Install tools
         run: |
-          python -m pip install --upgrade pip flake8 pytest pytest-cov build
+          python -m pip install --upgrade pip flake8 pytest pytest-cov build flask
 
       - name: Lint
         run: flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
@@ -47,18 +47,15 @@ jobs:
         with:
           name: build-${{ matrix.os }}-py${{ matrix.python }}
           path: dist/
-# ~~~~~~~~~~~~  existing content above stays ~~~~~~~~~~~~
 
-  deploy:                                   # <-- ADD THIS BLOCK
+  deploy:
     name: Deploy to Railway
-    needs: lint-test-build                  # only run after green CI
+    needs: lint-test-build
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-
       - name: Install Railway CLI
         run: npm i -g @railway/cli
-
       - name: Deploy
         env:
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
