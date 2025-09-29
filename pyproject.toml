@@ -6,3 +6,6 @@ build-backend = "setuptools.build_meta"
 name = "hello"
 version = "0.1.0"
 description = "Demo package for CI exercise"
+
+[tool.setuptools]
+py-modules = ["main"]   # <-- add this
