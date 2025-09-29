@@ -1,0 +1,49 @@
+name: Multi-stage CI with matrix & caching
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  lint-test-build:
+    name: ${{ matrix.os }} – Py ${{ matrix.python }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os:     [ubuntu-latest, windows-latest]
+        python: ['3.10', '3.11']
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python }}
+
+      - name: Install tools
+        run: |
+          python -m pip install --upgrade pip flake8 pytest pytest-cov build
+
+      - name: Lint
+        run: flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+
+      - name: Test & coverage
+        run: pytest --cov=. --cov-report=xml
+
+      - name: Upload coverage
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-${{ matrix.os }}-py${{ matrix.python }}
+          path: coverage.xml
+
+      - name: Build
+        run: |
+          python -m build --wheel --outdir dist/
+          cp main.py dist/
+
+      - name: Upload build
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-${{ matrix.os }}-py${{ matrix.python }}
+          path: dist/
